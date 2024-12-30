@@ -1,7 +1,7 @@
 package dev.amine.chatbot.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 import java.sql.Date;
 
 @Document(collection = "messages")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Setter
 public class Message {
@@ -18,6 +18,6 @@ public class Message {
     private String chatId;
     private String sender;
     private String content;
-    private Date timestamp;
+    private Long timestamp;
 
 }

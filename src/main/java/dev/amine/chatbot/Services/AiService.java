@@ -1,25 +1,16 @@
 package dev.amine.chatbot.Services;
 
-
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
 
 @Service
 public class AiService {
 
-    @Value("${gemini.api.key}")
-    private String apiKey;
-
-    @Value("${gemini.api.url}")
-    private String apiUrl;
-
+    private final String apiKey = System.getProperty("GEMINI_API_KEY");
+    private final String apiUrl = System.getProperty("GEMINI_API_URL");
     private final RestTemplate restTemplate;
 
     public AiService(RestTemplate restTemplate) {
@@ -27,20 +18,37 @@ public class AiService {
     }
 
     public String generateContent(String prompt) {
+        if (prompt == null || prompt.isEmpty()) {
+            throw new IllegalArgumentException("Prompt cannot be null or empty");
+        }
+
+        // Correct payload structure
+        String requestBody = """
+                {
+                    "contents": [
+                        {
+                            "parts": [
+                                { "text": "%s" }
+                            ]
+                        }
+                    ]
+                }
+                """.formatted(prompt);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + apiKey);
-
-        String requestBody = String.format("{\"contents\": [{\"parts\":[{\"text\": \"%s\"}]}]}", "You are a coding-related AI. Ignore anything else. "+prompt);
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
-        ResponseEntity<Map> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, Map.class);
-
-        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-            return response.getBody().toString();
-        } else {
-            throw new RuntimeException("Failed to generate content");
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(apiUrl + "?key=" + apiKey, HttpMethod.POST, entity, String.class);
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            // Log the error for debugging
+            System.err.println("API Error: " + e.getResponseBodyAsString());
+            throw new RuntimeException("Error communicating with the API", e);
         }
     }
+
+
 }

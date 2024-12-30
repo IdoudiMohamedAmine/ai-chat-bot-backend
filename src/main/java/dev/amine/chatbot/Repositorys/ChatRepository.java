@@ -12,4 +12,6 @@ public interface ChatRepository extends MongoRepository<Chat, String>{
     Chat findChatById(String id);
     List<Chat> findChatsByUserId(String userId);
     List<Chat> findByUserId(String userId);
+
+    List<Chat> findAllByUserId(String userId);
 }

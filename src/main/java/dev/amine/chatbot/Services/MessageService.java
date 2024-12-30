@@ -14,8 +14,8 @@ public class MessageService {
     public List<Message> getMessagesByChatId(String chatId) {
         return messageRepository.findByChatId(chatId);
     }
-    public Message createMessage(Message message){
-        return messageRepository.save(message);
+    public void createMessage(Message message){
+        messageRepository.save(message);
     }
 
 }
