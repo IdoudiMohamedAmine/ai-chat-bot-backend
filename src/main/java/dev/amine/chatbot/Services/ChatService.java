@@ -28,5 +28,9 @@ public class ChatService {
     }
 
 
-
+    public Chat updateChat(String chatId, String title) {
+        Chat chat = chatRepository.findChatById(chatId);
+        chat.setTitle(title);
+        return chatRepository.save(chat);
+    }
 }

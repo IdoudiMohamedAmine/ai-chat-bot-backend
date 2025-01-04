@@ -36,4 +36,8 @@ public class UserService {
             throw new RuntimeException("Error encrypting password", e);
         }
     }
+
+    public User getUser(String email) {
+        return userRepository.findUserByEmail(email);
+    }
 }
